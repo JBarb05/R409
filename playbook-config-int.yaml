@@ -46,6 +46,17 @@
           - default-router 192.168.2.1
           - dns-server 8.8.8.8
           - ip dhcp excluded-address 192.168.2.1
-        before:
-          - no ip dhcp pool LAN_POOL
-        save_when: modified
+
+    - name: Configuration du NAT
+      cisco.ios.ios_config:
+       lines:
+          - access-list 1 permit 192.168.2.0 255.255.255.0
+          - access-list 1 permit 192.168.3.0 255.255.255.0 
+          - access-list 1 permit 192.168.4.0 255.255.255.0 
+          - ip nat inside source list 1 interface GigabitEthernet1 overload
+      
+    - name: Configuration de l'interface NAT
+      cisco.ios.ios_config:
+        lines:
+          - ip nat outside
+        parents: interface GigabitEthernet1
