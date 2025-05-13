@@ -41,6 +41,7 @@
     - name: Configuration du DHCP
       cisco.ios.ios_config:
         lines:
+          - no ip dhcp pool LAN_POOL
           - ip dhcp pool LAN_POOL
           - network 192.168.2.0 255.255.255.0
           - default-router 192.168.2.1
@@ -55,8 +56,19 @@
           - access-list 1 permit 192.168.4.0 255.255.255.0 
           - ip nat inside source list 1 interface GigabitEthernet1 overload
       
-    - name: Configuration de l'interface NAT
+    - name: Configuration de l'interface NAT sortant
       cisco.ios.ios_config:
         lines:
           - ip nat outside
         parents: interface GigabitEthernet1
+
+    - name: Configuration de l'interface NAT entrant
+      cisco.ios.ios_config:
+        lines:
+          - ip nat inside
+        parents: interface {{ item }}
+      loop:
+        - GigabitEthernet2
+        - GigabitEthernet3
+        - GigabitEthernet4
+    
